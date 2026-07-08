@@ -27,6 +27,66 @@
             transition: background-color 0.5s ease;
         }
 
+        /* ================= 起始页样式 ================= */
+        #start-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .start-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 700px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            border-top: 4px solid var(--maimai-blue);
+            line-height: 1.8;
+        }
+        .start-card h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 25px;
+            color: #fff;
+        }
+        .start-card p {
+            margin-bottom: 16px;
+            font-size: 15px;
+            color: #ccc;
+        }
+        .start-card strong {
+            color: var(--maimai-orange);
+        }
+        .start-card .divider {
+            border-top: 1px solid #333;
+            margin: 25px 0;
+        }
+        .start-card .notes {
+            font-size: 13px;
+            color: #999;
+        }
+        .start-btn {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0;
+            background-color: var(--maimai-blue);
+            color: #000;
+            padding: 15px 40px;
+            font-size: 17px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-align: center;
+        }
+        .start-btn:hover {
+            background-color: #0096b6;
+        }
+
+        /* ================= 以下为原网站全部样式（保持不动） ================= */
         header {
             background-color: #000;
             padding: 15px 30px;
@@ -35,43 +95,34 @@
             align-items: center;
             border-bottom: 3px solid var(--maimai-blue);
         }
-
         .logo { font-size: 20px; font-weight: bold; color: #fff; letter-spacing: 1px; }
         .logo span { color: var(--maimai-orange); }
         nav a { color: #888; text-decoration: none; margin-left: 15px; font-size: 14px; cursor: pointer; }
         nav a:hover { color: #fff; }
-
         .container { max-width: 1100px; margin: 40px auto; padding: 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; margin: 10px auto; } }
-
         .page { display: none; }
         .page.active-page { display: block; }
-
         .main-card { background-color: var(--card-bg); border-radius: 8px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-top: 4px solid var(--maimai-blue); }
         .side-card { background-color: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-top: 4px solid var(--maimai-orange); }
         h2, h3 { margin-top: 0; color: #fff; }
-
         .search-box { margin-top: 25px; display: flex; flex-direction: column; gap: 15px; }
         .input-group { display: flex; flex-direction: column; gap: 5px; }
         .input-group label { font-size: 12px; color: #aaa; text-transform: uppercase; }
         input[type="text"], input[type="password"] { background-color: #000; border: 2px solid #444; padding: 12px; color: #fff; font-size: 16px; border-radius: 4px; outline: none; }
         input[type="text"]:focus, input[type="password"]:focus { border-color: var(--maimai-blue); }
-
         button { background-color: var(--maimai-blue); color: #000; border: none; padding: 15px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 10px; transition: background-color 0.2s; }
         button:hover { background-color: #0096b6; }
         .msg { margin-top: 15px; font-size: 14px; min-height: 20px; }
         .error { color: #ff4d4d; }
         .success { color: #4dff4d; }
-
         .leaderboard { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
         .leaderboard th, .leaderboard td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #333; }
         .glitch-text { color: #ff4d4d; font-weight: bold; }
-
         .song-banner {
             background: linear-gradient(135deg, #2c004d 0%, #1e1e1e 100%);
             padding: 20px; border-radius: 6px; margin-bottom: 20px; border-left: 5px solid var(--maimai-purple);
         }
-
         .marquee { background-color: #000; color: #ff4d4d; padding: 10px; font-size: 12px; position: fixed; bottom: 0; width: 100%; border-top: 1px solid #333; z-index: 100; }
 
         /* ================= TERMINAL SYSTEM STYLE ================= */
@@ -93,14 +144,11 @@
         .term-btn { background: #111; color: #00d2ff; border: 1px solid #00d2ff; padding: 12px 25px; cursor: pointer; font-family: monospace; transition: all 0.2s; }
         .term-btn:hover { background: #00d2ff; color: #000; }
         .log-display { background: #000; border: 1px solid #111; height: 440px; overflow-y: auto; padding: 20px; font-size: 14px; line-height: 1.6; color: #aaa; }
-
         .log-link { color: #ffb703; text-decoration: underline; cursor: pointer; display: inline-block; margin-bottom: 8px; }
         .log-link:hover { color: #fff; }
         .code-block { background: #111; padding: 15px; border-left: 3px solid #444; color: #aaa; font-size: 14px; margin: 10px 0; font-family: monospace; line-height: 1.5; overflow-x: auto;}
-
         .clue-highlight { color: #ffb703; font-weight: bold; text-decoration: underline; background: rgba(255,183,3,0.1); padding: 0 4px; border-radius: 2px; }
         .clue-danger { color: #ff4d4d; font-weight: bold; background: rgba(255,77,77,0.15); padding: 2px 6px; border-radius: 2px; border: 1px dashed #ff4d4d; }
-
         .glitch-screen { animation: glitch 0.1s linear infinite; }
         .crimson-glitch { animation: crimson-glitch 0.15s linear infinite; background-color: #1a0206 !important;}
         @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-3px, 2px) } 40% { transform: translate(2px, -3px) } 60% { transform: translate(-2px, 3px) } 100% { transform: translate(0) } }
@@ -319,7 +367,31 @@
 </head>
 <body>
 
-<div id="normal-website">
+<!-- ================= 起始页 ================= -->
+<div id="start-page">
+    <div class="start-card">
+        <h1>H.C.Symphony</h1>
+
+        <p>你叫陈星，一名普通但计算机知识过硬的舞萌玩家。</p>
+
+        <p>你的挚友<strong>林哲</strong>（网名 Track4）是国内顶尖 Ranker。可就在两天前，你收到了他游玩舞萌过程中<strong>昏迷送医</strong>的消息，并得知了整件事情的诡异经过……
+
+        <p>你想起林哲曾托你帮忙在<strong>maiPro</strong>官方统计系统上传成绩，告诉过你密码——是他<strong>姓名的拼音</strong>。</p>
+
+        <p>利用某个程序漏洞，你成功以林哲的身份登录并同时潜入系统后台……你决定从检索栏入手，一步步揭开这桩诡异事件的真相。</p>
+
+        <div class="divider"></div>
+
+        <p class="notes">📌 游玩提示：<br>
+        1. 仅需对舞萌 DX 有一定了解，无需专业编程知识。<br>
+        2. 善用 Easymai、浏览器等工具辅助解谜。</p>
+
+        <a class="start-btn" onclick="startGame()">▶ 开始调查</a>
+    </div>
+</div>
+
+<!-- ================= 以下原封不动：表层网站 + 终端 + 论坛 ================= -->
+<div id="normal-website" style="display:none;">
     <header>
         <div class="logo">mai<span>Pro</span> Archive</div>
         <nav>
@@ -465,6 +537,12 @@
 </div>
 
 <script>
+// ---------- 起始页跳转 ----------
+function startGame() {
+    document.getElementById('start-page').style.display = 'none';
+    document.getElementById('normal-website').style.display = 'block';
+}
+
 // ---------- 表层逻辑 ----------
 function switchPage(pageName) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
@@ -580,7 +658,7 @@ function verifyChartPwd() {
             document.getElementById('hcs-forum').style.display = 'block';
             document.body.style.backgroundColor = '#0a0c0f';
             alert("身份验证通过。\n管理员权限已授予。\n欢迎接入 H.C.Symphony 核心网络。");
-            initForumDefault(); // 加载默认公告帖子
+            initForumDefault();
         }, 2000);
     } else {
         alert("❌ 传感器密匙重组失败。请重新核对双押WiFi滑条的盲区判定走势。");
@@ -634,20 +712,16 @@ function loadPost(postId) {
     }
     area.innerHTML = postContents[postId];
 
-    // 清除之前的定时器
     if (metaTimer) {
         clearTimeout(metaTimer);
         metaTimer = null;
     }
 
-    // 特殊帖子：5秒后闪烁并替换发布时间
     if (postId === 'pandora' || postId === 'shironeko') {
         metaTimer = setTimeout(() => {
             const metaEl = document.querySelector('#post-content-area .post-meta');
             if (!metaEl) return;
-            // 添加闪烁类
             metaEl.classList.add('meta-blink');
-            // 2秒后替换文本并移除闪烁类
             setTimeout(() => {
                 if (postId === 'pandora') {
                     metaEl.textContent = 'S2V5MTpJRD1GaU5BTEVicG09bWF4';
@@ -655,7 +729,7 @@ function loadPost(postId) {
                     metaEl.textContent = 'S2V5MjpJRD1GaU5BTEVicmVhay9SZU09bWlu';
                 }
                 metaEl.classList.remove('meta-blink');
-                metaEl.style.color = '#ff0000'; // 保持红色
+                metaEl.style.color = '#ff0000';
             }, 2000);
         }, 5000);
     }
@@ -681,34 +755,29 @@ function closeLoginModal() {
     document.getElementById('login-modal').style.display = 'none';
 }
 
-// 管理员登录验证
 function verifyAdminLogin() {
     const username = document.getElementById('admin-user').value.trim();
     const password = document.getElementById('admin-pass').value.trim();
     if (username === 'Symphony_Admin' && password === '799803') {
         closeLoginModal();
         alert("管理员凭证正确。\n搜索栏权限已解锁，您现在可以检索内部档案。");
-        // 解锁搜索栏
         const searchBtn = document.getElementById('hcs-search-btn');
         searchBtn.onclick = doSearch;
         searchBtn.textContent = "搜索 (已授权)";
-        // 更新登录区域显示
         document.getElementById('btn-login').textContent = 'Symphony_Admin';
         document.getElementById('btn-login').style.color = '#4dff4d';
-        document.getElementById('btn-login').onclick = null; // 防止重复登录
+        document.getElementById('btn-login').onclick = null;
     } else {
         alert("❌ 管理员认证失败。请核对凭证。");
     }
 }
 
-// 解锁后的搜索功能（暂时占位）
 function doSearch() {
     const query = document.getElementById('hcs-search-input').value.trim();
     if (!query) return;
     alert("搜索功能即将开放。\n待检索条目：" + query + "\n（数据库接口准备中...）");
 }
 
-// 导航标签点击
 document.querySelectorAll('.nav-tab').forEach(tab => {
     tab.addEventListener('click', function(e) {
         const tabName = this.dataset.tab;
@@ -721,13 +790,11 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
     });
 });
 
-// 注册按钮
 document.getElementById('btn-register').addEventListener('click', function(e) {
     e.preventDefault();
     alert('注册功能已暂停。请使用管理员分配的凭证登录。');
 });
 
-// 防止点击权限弹窗内部关闭
 document.querySelector('.permission-denied-box').addEventListener('click', function(e) {
     e.stopPropagation();
 });

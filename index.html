@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>maimai DX - Player Data Archive (Beta v4.0)</title>
+    <style>
+        :root {
+            --maimai-blue: #00b4d8;
+            --maimai-orange: #ffb703;
+            --maimai-purple: #9d4edd;
+            --bg-dark: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --symphony-red: #d90429;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle, #222 10%, transparent 11%);
+            background-size: 30px 30px;
+            transition: background-color 0.5s ease;
+        }
+
+        header {
+            background-color: #000;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--maimai-blue);
+        }
+
+        .logo { font-size: 20px; font-weight: bold; color: #fff; letter-spacing: 1px; }
+        .logo span { color: var(--maimai-orange); }
+        nav a { color: #888; text-decoration: none; margin-left: 15px; font-size: 14px; cursor: pointer; }
+        nav a:hover { color: #fff; }
+
+        .container { max-width: 1100px; margin: 40px auto; padding: 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; margin: 10px auto; } }
+
+        .page { display: none; }
+        .page.active-page { display: block; }
+
+        .main-card { background-color: var(--card-bg); border-radius: 8px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-top: 4px solid var(--maimai-blue); }
+        .side-card { background-color: var(--card-bg); border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-top: 4px solid var(--maimai-orange); }
+        h2, h3 { margin-top: 0; color: #fff; }
+
+        .search-box { margin-top: 25px; display: flex; flex-direction: column; gap: 15px; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 12px; color: #aaa; text-transform: uppercase; }
+        input[type="text"], input[type="password"] { background-color: #000; border: 2px solid #444; padding: 12px; color: #fff; font-size: 16px; border-radius: 4px; outline: none; }
+        input[type="text"]:focus, input[type="password"]:focus { border-color: var(--maimai-blue); }
+
+        button { background-color: var(--maimai-blue); color: #000; border: none; padding: 15px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; margin-top: 10px; transition: background-color 0.2s; }
+        button:hover { background-color: #0096b6; }
+        .msg { margin-top: 15px; font-size: 14px; min-height: 20px; }
+        .error { color: #ff4d4d; }
+        .success { color: #4dff4d; }
+
+        .leaderboard { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        .leaderboard th, .leaderboard td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #333; }
+        .glitch-text { color: #ff4d4d; font-weight: bold; }
+
+        .song-banner {
+            background: linear-gradient(135deg, #2c004d 0%, #1e1e1e 100%);
+            padding: 20px; border-radius: 6px; margin-bottom: 20px; border-left: 5px solid var(--maimai-purple);
+        }
+
+        .marquee { background-color: #000; color: #ff4d4d; padding: 10px; font-size: 12px; position: fixed; bottom: 0; width: 100%; border-top: 1px solid #333; z-index: 100; }
+
+        /* ================= TERMINAL SYSTEM STYLE ================= */
+        #terminal-system {
+            display: none;
+            background-color: #0a0a0c;
+            color: #00d2ff;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 25px;
+            border: 1px solid #222;
+            margin: 20px auto;
+            max-width: 950px;
+            border-radius: 6px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+        .term-header { border-bottom: 2px solid #222; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; font-size: 13px; color: #666; }
+        .term-search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .term-input { flex: 1; background: #000; border: 1px solid #333; color: #00d2ff; padding: 12px; font-family: monospace; font-size: 15px; }
+        .term-btn { background: #111; color: #00d2ff; border: 1px solid #00d2ff; padding: 12px 25px; cursor: pointer; font-family: monospace; transition: all 0.2s; }
+        .term-btn:hover { background: #00d2ff; color: #000; }
+        .log-display { background: #000; border: 1px solid #111; height: 440px; overflow-y: auto; padding: 20px; font-size: 14px; line-height: 1.6; color: #aaa; }
+
+        .log-link { color: #ffb703; text-decoration: underline; cursor: pointer; display: inline-block; margin-bottom: 8px; }
+        .log-link:hover { color: #fff; }
+        .code-block { background: #111; padding: 15px; border-left: 3px solid #444; color: #aaa; font-size: 14px; margin: 10px 0; font-family: monospace; line-height: 1.5; overflow-x: auto;}
+
+        .clue-highlight { color: #ffb703; font-weight: bold; text-decoration: underline; background: rgba(255,183,3,0.1); padding: 0 4px; border-radius: 2px; }
+        .clue-danger { color: #ff4d4d; font-weight: bold; background: rgba(255,77,77,0.15); padding: 2px 6px; border-radius: 2px; border: 1px dashed #ff4d4d; }
+
+        .glitch-screen { animation: glitch 0.1s linear infinite; }
+        .crimson-glitch { animation: crimson-glitch 0.15s linear infinite; background-color: #1a0206 !important;}
+        @keyframes glitch { 0% { transform: translate(0) } 20% { transform: translate(-3px, 2px) } 40% { transform: translate(2px, -3px) } 60% { transform: translate(-2px, 3px) } 100% { transform: translate(0) } }
+        @keyframes crimson-glitch { 0% { opacity: 0.9; transform: translate(2px, -1px); } 50% { opacity: 1; filter: hue-rotate(10deg); transform: translate(-2px, 2px); } 100% { opacity: 0.9; transform: translate(0); } }
+
+        /* ================= 硬核交响论坛 H.C.Symphony 样式 ================= */
+        #hcs-forum {
+            display: none;
+            min-height: 100vh;
+            background-color: #0a0c0f;
+            color: #ccc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .hcs-header {
+            background-color: #12151a;
+            border-bottom: 2px solid #2a2f38;
+            padding: 10px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .hcs-logo {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+        .hcs-logo .cn {
+            font-size: 28px;
+            font-weight: bold;
+            color: #e0e0e0;
+            letter-spacing: 4px;
+        }
+        .hcs-logo .en {
+            font-size: 12px;
+            color: #8a8f98;
+            letter-spacing: 1px;
+        }
+        .hcs-search {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #1e2229;
+            border-radius: 4px;
+            padding: 4px 10px;
+            border: 1px solid #333;
+        }
+        .hcs-search input {
+            background: transparent;
+            border: none;
+            color: #ccc;
+            padding: 8px 6px;
+            width: 250px;
+            font-size: 14px;
+            outline: none;
+        }
+        .hcs-search button {
+            background: #3a3f48;
+            border: none;
+            color: #ccc;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .hcs-search button:hover { background: #505763; }
+        .hcs-user-actions {
+            display: flex;
+            gap: 15px;
+        }
+        .hcs-user-actions a {
+            color: #999;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 3px;
+            transition: 0.2s;
+        }
+        .hcs-user-actions a:hover { color: #fff; background: #2a2f38; }
+        .hcs-nav {
+            background: #1a1d24;
+            border-bottom: 1px solid #2a2f38;
+            display: flex;
+            padding: 0 30px;
+        }
+        .hcs-nav a {
+            display: inline-block;
+            padding: 14px 24px;
+            color: #aaa;
+            text-decoration: none;
+            font-size: 15px;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+        }
+        .hcs-nav a.active { color: #fff; border-bottom-color: var(--symphony-red); }
+        .hcs-main {
+            display: flex;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 20px 30px;
+            gap: 30px;
+        }
+        @media (max-width: 768px) {
+            .hcs-main { flex-direction: column; padding: 10px; }
+            .hcs-sidebar { width: 100% !important; }
+        }
+        .hcs-sidebar {
+            width: 230px;
+            flex-shrink: 0;
+        }
+        .hcs-sidebar h3 {
+            margin: 0 0 15px 0;
+            font-size: 14px;
+            color: #999;
+            border-bottom: 1px solid #2a2f38;
+            padding-bottom: 8px;
+        }
+        .hcs-hot-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .hcs-hot-list li {
+            padding: 10px 5px;
+            border-bottom: 1px solid #1e2229;
+            font-size: 13px;
+            color: #aaa;
+            cursor: default;
+            transition: 0.2s;
+        }
+        .hcs-hot-list li.clickable {
+            cursor: pointer;
+            color: #ccd0d8;
+        }
+        .hcs-hot-list li.clickable:hover {
+            color: #fff;
+            background: #1e2229;
+        }
+        .hcs-hot-list li.disabled {
+            color: #555;
+            cursor: not-allowed;
+            font-style: italic;
+        }
+        .hcs-content {
+            flex: 1;
+            background: #11141a;
+            border-radius: 6px;
+            padding: 25px;
+            border: 1px solid #2a2f38;
+        }
+        .post-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #e0e0e0;
+            border-bottom: 1px solid #2a2f38;
+            padding-bottom: 12px;
+        }
+        .post-meta {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 25px;
+            transition: color 0.3s;
+        }
+        .post-meta.meta-blink {
+            animation: meta-blink 0.3s linear 6;
+            color: #ff0000;
+        }
+        @keyframes meta-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .post-body {
+            line-height: 1.8;
+            color: #bbb;
+            font-size: 15px;
+        }
+
+        /* 权限不足弹窗 */
+        .permission-denied-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .permission-denied-box {
+            background: #1a0003;
+            border: 2px solid #ff0044;
+            padding: 40px;
+            text-align: center;
+            max-width: 450px;
+            color: #ff4466;
+            font-family: 'Courier New', monospace;
+            animation: crimson-glitch 0.15s linear infinite;
+        }
+        .permission-denied-box h2 {
+            margin: 0 0 20px 0;
+            font-size: 24px;
+        }
+        .permission-denied-box button {
+            background: #33000a;
+            border: 1px solid #ff0044;
+            color: #ff4466;
+            padding: 10px 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="normal-website">
+    <header>
+        <div class="logo">mai<span>Pro</span> Archive</div>
+        <nav>
+            <a id="nav-home" class="active" onclick="switchPage('home')">[ 首页 ]</a>
+            <a id="nav-rank" onclick="switchPage('rank')">[ 课题曲排行 ]</a>
+            <a href="#" style="color:#ff4d4d;" onclick="alert('Runtime Error: Variable [Track_4] matching failed.')">[ 异常监控 ]</a>
+        </nav>
+    </header>
+
+    <div id="page-home" class="container page active-page">
+        <div class="main-card">
+            <h2>选手数据同步终端</h2>
+            <p style="color: #888; font-size: 14px;">2026年舞萌全国海选赛 - 官方指定民间同步节点。</p>
+            <div class="search-box">
+                <div class="input-group"><label>选手 ID</label><input type="text" id="player-id" placeholder="ID (例: YOSHI☆NX)"></div>
+                <div class="input-group"><label>同步密码</label><input type="password" id="player-pwd" placeholder="Password"></div>
+                <button onclick="checkPlayer()">同步数据</button>
+                <div id="msg-box" class="msg"></div>
+            </div>
+        </div>
+        <div class="side-card">
+            <h3>海选赛瞬时看板 (TOP 10)</h3>
+            <table class="leaderboard" style="font-size: 12px;">
+                <tr><th>名次</th><th>选手ID</th><th>达成率</th></tr>
+                <tr style="background: rgba(255,77,77,0.05);"><td>1</td><td>Track_4</td><td class="glitch-text">101.4401% ⚠</td></tr>
+                <tr><td>2</td><td>YOSHI☆NX</td><td>101.0000%</td></tr>
+                <tr><td>3</td><td>MooseRiven</td><td>101.0000%</td></tr>
+                <tr><td>4</td><td>KIRA_01</td><td>101.0000%</td></tr>
+                <tr><td>5</td><td>LUNA_M</td><td>100.9826%</td></tr>
+                <tr><td>6</td><td>ZENITH</td><td>100.9730%</td></tr>
+                <tr><td>7</td><td>GALAXY</td><td>100.9527%</td></tr>
+                <tr><td>8</td><td>ECHO_99</td><td>100.9363%</td></tr>
+                <tr><td>9</td><td>NEON_X</td><td>100.9178%</td></tr>
+                <tr><td>10</td><td>NULL_PTR</td><td>100.9067%</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div id="page-rank" class="container page" style="grid-template-columns: 1fr;">
+        <div class="main-card" style="border-top-color: var(--maimai-purple);">
+            <div class="song-banner">
+                <span style="background: var(--maimai-purple); color: #fff; padding: 2px 6px; font-size: 12px; font-weight: bold; border-radius: 3px; vertical-align: middle;">MASTER</span>
+                <h2 style="display: inline; margin-left: 10px; vertical-align: middle; font-size: 22px;">PANDORA PARADOXXX</h2>
+                <span style="float: right; color: var(--maimai-purple); font-weight: bold; font-size: 20px;">Lv.14+</span>
+                <p style="color: #aaa; font-size: 13px; margin: 10px 0 0 0;">海选赛指定终极课题曲</p>
+            </div>
+            <table class="leaderboard">
+                <thead><tr style="border-bottom: 2px solid #444; color: #aaa;"><th>排名</th><th>选手 ID</th><th>游玩机台编号</th><th>达成率</th></tr></thead>
+                <tbody>
+                    <tr style="background: rgba(157,78,221,0.1);"><td><strong>1</strong></td><td style="color: #ff4d4d; font-weight: bold;">Track_4</td><td>#0044-A</td><td class="glitch-text">101.4401% ⚠</td></tr>
+                    <tr><td><strong>2</strong></td><td>YOSHI☆NX</td><td>#0012-B</td><td>101.0000%</td></tr>
+                    <tr><td><strong>3</strong></td><td>MooseRiven</td><td>#0008-A</td><td>101.0000%</td></tr>
+                    <tr><td><strong>4</strong></td><td>KIRA_01</td><td>#0021-C</td><td>101.0000%</td></tr>
+                    <tr><td><strong>5</strong></td><td>Tico</td><td>#0011-A</td><td>100.9826%</td></tr>
+                    <tr><td><strong>6</strong></td><td>ZENITH</td><td>#0055-B</td><td>100.9730%</td></tr>
+                    <tr><td><strong>7</strong></td><td>GALAXY</td><td>#0003-C</td><td>100.9527%</td></tr>
+                    <tr><td><strong>8</strong></td><td>ECHO_99</td><td>#0019-B</td><td>100.9363%</td></tr>
+                    <tr><td><strong>9</strong></td><td>NEON_X</td><td>#0082-A</td><td>100.9178%</td></tr>
+                    <tr><td><strong>10</strong></td><td>NULL_PTR</td><td>#0041-C</td><td>100.9067%</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="marquee"><marquee scrollamount="4">⚠️ 紧急公告：UID: 0114514、1919810、0676767 账户游玩网络数据异常，已被系统强制隔离锁定。严禁通过科技手段上传虚假成绩。</marquee></div>
+</div>
+
+<div id="terminal-system">
+    <div class="term-header">
+        <div>MAI-NET://NODE_BACKUP/LOG_DECRYPTOR</div>
+        <div>STATUS: LOG_DECRYPT_ACTIVE</div>
+    </div>
+    <div class="term-search-bar">
+        <input type="text" id="term-input-field" class="term-input" placeholder="输入核心关键词或设备编号检索相关日志..." onkeypress="if(event.keyCode==13)searchLog()">
+        <button class="term-btn" onclick="searchLog()">检索 (SEARCH)</button>
+    </div>
+    <div id="log-screen" class="log-display">
+        [SYSTEM]: 成功挂载中心数据暂存节点。<br><br>
+        林哲留下的最后数据已被封存。请通过具体线索关键词（如机台编号）进行过滤筛选。
+    </div>
+</div>
+
+<!-- ================= 硬核交响论坛 H.C.Symphony ================= -->
+<div id="hcs-forum">
+    <div class="hcs-header">
+        <div class="hcs-logo">
+            <span class="cn">硬核交响</span>
+            <span class="en">H.C.Symphony</span>
+        </div>
+        <div class="hcs-search">
+            <input type="text" id="hcs-search-input" placeholder="搜索帖子、资源...">
+            <button id="hcs-search-btn" onclick="showPermDenied()">搜索</button>
+        </div>
+        <div class="hcs-user-actions">
+            <a id="btn-register" style="color:#555; cursor:not-allowed;" title="暂停注册">注册</a>
+            <a id="btn-login" onclick="showLoginModal()">登录</a>
+        </div>
+    </div>
+
+    <div class="hcs-nav">
+        <a class="nav-tab" data-tab="home">首页</a>
+        <a class="nav-tab active" data-tab="forum">论坛</a>
+        <a class="nav-tab" data-tab="news">资讯</a>
+        <a class="nav-tab" data-tab="resource">资源</a>
+    </div>
+
+    <div class="hcs-main">
+        <div class="hcs-sidebar">
+            <h3>🔥 近期热点</h3>
+            <ul class="hcs-hot-list">
+                <li class="clickable" onclick="loadPost('announcement')">· 公告：HCS本站功能维护中，短期内暂停使用</li>
+                <li class="disabled" title="暂时无法查看">· 舞萌DX2026海选赛赛程暂缓</li>
+                <li class="disabled" title="暂时无法查看">· 舞萌海选赛指定机台频繁故障</li>
+                <li class="clickable" onclick="loadPost('pandora')">· 紫潘事件全程回顾</li>
+                <li class="clickable" onclick="loadPost('shironeko')">· 白XX全国首杀！！</li>
+            </ul>
+        </div>
+
+        <div class="hcs-content" id="post-content-area">
+            <!-- 动态载入帖子内容 -->
+        </div>
+    </div>
+
+    <!-- 权限不足弹窗 -->
+    <div id="perm-denied-overlay" class="permission-denied-overlay" onclick="closePermDenied()">
+        <div class="permission-denied-box">
+            <h2>⚠ 访问被拒绝</h2>
+            <p>[SEC_ERR] 当前会话令牌未授予数据检索权限。<br>已记录您的IP及硬件指纹。<br>若反复尝试，将触发物理定位追踪。</p>
+            <p style="font-size:12px; color:#ff9999;">H.C.Symphony 安全协议 v4.1</p>
+            <button onclick="event.stopPropagation(); closePermDenied();">返回</button>
+        </div>
+    </div>
+
+    <!-- 登录模态框 -->
+    <div id="login-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center;">
+        <div style="background:#1a1d24; padding:40px; border:1px solid #444; width:350px; border-radius:8px;">
+            <h3 style="margin-top:0; color:#ddd;">管理员认证</h3>
+            <input type="text" id="admin-user" placeholder="账号" style="width:100%; padding:10px; margin-bottom:10px; background:#000; border:1px solid #333; color:#fff;"><br>
+            <input type="password" id="admin-pass" placeholder="密码" style="width:100%; padding:10px; margin-bottom:15px; background:#000; border:1px solid #333; color:#fff;"><br>
+            <button style="width:100%; padding:12px; background:var(--symphony-red); border:none; color:#fff; font-weight:bold; cursor:pointer;" onclick="verifyAdminLogin()">登 录</button>
+            <button style="width:100%; margin-top:10px; padding:10px; background:transparent; border:1px solid #555; color:#aaa; cursor:pointer;" onclick="closeLoginModal()">取消</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ---------- 表层逻辑 ----------
+function switchPage(pageName) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+    if(pageName === 'home') document.getElementById('page-home').classList.add('active-page');
+    if(pageName === 'rank') document.getElementById('page-rank').classList.add('active-page');
+}
+
+function checkPlayer() {
+    const idInput = document.getElementById('player-id').value.trim();
+    const pwdInput = document.getElementById('player-pwd').value.trim();
+    const msgBox = document.getElementById('msg-box');
+    
+    if (idInput === 'Track_4' && pwdInput === 'linzhe') {
+        msgBox.innerHTML = "<span class='success'>⚡ 凭证匹配，正在载入中心机台备份日志流...</span>";
+        document.body.classList.add('glitch-screen');
+        setTimeout(() => {
+            document.body.classList.remove('glitch-screen');
+            document.getElementById('normal-website').style.display = 'none';
+            document.getElementById('terminal-system').style.display = 'block';
+            document.body.style.backgroundColor = '#050505';
+        }, 1000);
+    } else {
+        msgBox.innerHTML = "<span class='error'>❌ 错误：认证失败。未在公开名单中找到该凭证。</span>";
+    }
+}
+
+// ---------- 中层检索逻辑 ----------
+const keywordMapping = {
+    "0044": "link_0044", "0044-a": "link_0044", "#0044-a": "link_0044",
+    "track5": "link_t5", "track 05": "link_t5", "track05": "link_t5", "track_05": "link_t5",
+    "slide_wifi_both": "link_wifi", "wifi": "link_wifi"
+};
+
+const logContentDetails = {
+    "link_0044": `<span class='system-alert'>[SYS_ERR] DEVICE_ID: #0044-A (2026-07-07 23:11:04)</span><br>
+                  <div class='code-block'>
+                  USER_LOGIN: Track_4<br>
+                  --------------------------------------------------<br>
+                  TRACK 01: PANDORA PARADOXXX [MASTER] -> All Perfect<br>
+                  TRACK 02: PANDORA PARADOXXX [MASTER] -> All Perfect<br>
+                  TRACK 03: PANDORA PARADOXXX[MASTER] -> All Perfct<br>
+                  TRACK 04: PANDORA PARADOXXX [MASTER] -> All Perfect+<br>
+                  <span class='clue-danger'>[CRITICAL]: OVERFLOW DETECTED. FORCING NEXT TRACK...</span><br>
+                  <span class='clue-danger'>TRACK 05</span> : PANDORA PARADOXXX [MASTER] -> <span style='color:#ff4d4d; font-weight:bold;'>STUCK / HOOK_ACTIVE</span><br>
+                  --------------------------------------------------<br>
+                  CRITICAL_ERROR: Photo-electric sensor logic desync.<br>
+                  IO_STATUS: [Button 1-8: OK] [Slide_Sensor: STUCK_ON_SPECIAL_PATTERN]<br>
+                  NET_STATUS: Network stream isolated by remote host control protocol.
+                  </div>`,
+                  
+    "link_t5": `<span class='system-alert'>[SYS_PATCH] SYSTEM_FIRMWARE_HOOK_REPORT (TRACK_05_AUDIT)</span><br>
+                <div class='code-block'>
+                检测到针对游戏结算轨道的底层越权注入。<br>
+                注入模块: MaimaiDX_Track05_Hook.exe<br>
+                安全等级: CRITICAL_PRIVILEGE<br>
+                触发拦截机制: IF CREDIT_TRACK_INDEX == 5 AND SLIDE_PATTERN == <span class='clue-highlight'>SLIDE_WIFI_BOTH</span><br>
+                系统行为: 物理数据重定向，等待外部实机触控区密匙覆盖输入。<br><br>
+                <span style='color:#00d2ff; font-weight:bold;'>[输入物理传感器密匙]:</span><br>
+                <input type='text' id='chart-pwd' placeholder='输入解析后的触控区判定密匙 (不分大小写)...' style='background:#000; color:#00d2ff; border:1px solid #00d2ff; padding:8px; margin-top:10px; width:350px; font-family:monospace;'>
+                <button onclick='verifyChartPwd()' style='padding:8px 15px; background:#00d2ff; color:#000; font-weight:bold; cursor:pointer; font-family:monospace;'>SUBMIT</button>
+                </div>`,
+                
+    "link_wifi": `<span class='system-alert'>[AUDIT_LOG] SLIDE_WIFI_BOTH_OBJECT.CONF</span><br>
+                   <div class='code-block'>
+                   [TRACK_STREAM_INFO]: 谱面物理流异常。监测到针对底层判定的强行阻断。<br>
+                   TARGET_TRACK: PANDORA PARADOXXX [MASTER]<br>
+                   [WARNING]: 监测到曲目末尾两根 <span class='clue-highlight'>【双押 WiFi 星星滑条】</span> 发生传感器重定向。<br><br>
+                   [DECRYPT_HINT]: 请结合机台官方标准触屏传感器分布 。<br>
+                   密匙分两部分组合拼接提取：<br>
+                   1. 该Slide【需要全部触碰的判定区域】<br>
+                   2. 该Slide【判定区域A区中没有被覆盖的两个判定点】(如 A1A2)<br><br>
+                   <span style='color:#aaa;'>（格式示例：若第一部分为 X，第二部分为 A*A#，则密匙为 XA*A# 或 A*A#X）</span>
+                   </div>`
+};
+
+function searchLog() {
+    const q = document.getElementById('term-input-field').value.trim().toLowerCase();
+    const s = document.getElementById('log-screen');
+    if(!q) return;
+    s.innerHTML = "[SYSTEM]: 正在检索...<br><br>";
+    setTimeout(() => {
+        const k = keywordMapping[q];
+        if (k) {
+            let title = k === "link_0044" ? "▶ [运行日志] SEGA_DX_0044A_20260707_CRASH.log" : 
+                        k === "link_t5" ? "▶ [拦截报告] CRITICAL_TRACK_05_INJECTION_REPORT.md" : 
+                        "▶ [传感器协议] SLIDE_WIFI_BOTH_OBJECT.CONF";
+            s.innerHTML += `📄 找到 1 条系统原始日志：<br><br><span class="log-link" onclick="showLogDetail('${k}')">${title}</span><br>`;
+        } else {
+            s.innerHTML += `❌ [SYSTEM]: 未找到包含关键词 '${q}' 的备份日志。`;
+        }
+    }, 400);
+}
+
+function showLogDetail(id) {
+    document.getElementById('log-screen').innerHTML = `<div style='margin-bottom:15px;'><span class='log-link' onclick='restoreList()'>◀ 返回检索列表</span></div>` + logContentDetails[id];
+}
+
+function restoreList() { 
+    document.getElementById('log-screen').innerHTML = "[SYSTEM]: 已返回。请重新输入关键词或机台号进行深层过滤。"; 
+}
+
+// ---------- 里层触发器（星星判定区密码验证） ----------
+function verifyChartPwd() {
+    const pwd = document.getElementById('chart-pwd').value.trim().toUpperCase();
+    if (pwd === 'BA3A6' || pwd === 'A3A6B') {
+        const termSys = document.getElementById('terminal-system');
+        termSys.innerHTML = "<h2 style='color:#ff4d4d; font-size:24px; text-align:center; margin-top:150px; animation:glitch 0.2s infinite;'>[CRITICAL WARNING]<br>UNKNOWN INTRUSION DETECTED.<br>OVERRIDING LOCAL LOGS...</h2>";
+        document.body.classList.add('crimson-glitch');
+        
+        setTimeout(() => {
+            document.body.classList.remove('crimson-glitch');
+            termSys.style.display = 'none';
+            document.getElementById('hcs-forum').style.display = 'block';
+            document.body.style.backgroundColor = '#0a0c0f';
+            alert("身份验证通过。\n管理员权限已授予。\n欢迎接入 H.C.Symphony 核心网络。");
+            initForumDefault(); // 加载默认公告帖子
+        }, 2000);
+    } else {
+        alert("❌ 传感器密匙重组失败。请重新核对双押WiFi滑条的盲区判定走势。");
+    }
+}
+
+// ---------- 硬核交响论坛逻辑 ----------
+let metaTimer = null;
+
+const postContents = {
+    announcement: `
+        <div class="post-title">📢 公告：HCS本站功能维护中，短期内暂停使用</div>
+        <div class="post-meta">发布者：Symphony_Admin &nbsp;|&nbsp; 2026-07-07 22:30</div>
+        <div class="post-body">
+            <p>致各位核心成员及访客：</p>
+            <p>因近期外部网络环境异常，本站（硬核交响 H.C.Symphony）将于即日起进入<strong style="color:#ff9900;">紧急维护状态</strong>。论坛发帖、资源下载、资讯板块全部功能暂时关闭，恢复时间待定。</p>
+            <p>在此期间，所有公开访问均将被重定向至本公告页面。如需获取内部通讯，请使用<strong style="color:var(--symphony-red);">管理员凭证</strong>通过认证节点接入。</p>
+            <p>对于正在跟进<strong style="color:var(--symphony-red);">激活计划</strong>的各位同仁，请保持静默，避免在非加密信道讨论项目细节。</p>
+            <p style="color:#666;">—— H.C.Symphony 管理署</p>
+        </div>
+    `,
+    pandora: `
+        <div class="post-title">📌 紫潘事件全程回顾</div>
+        <div class="post-meta">发布者：王文鸠 &nbsp;|&nbsp; 2026-07-02 01:42</div>
+        <div class="post-body">
+            <p>昨晚人在现场，到现在还觉得吓人。趁记忆还清楚赶紧把经过写下来，怕过两天就说不清了。</p>
+            <p>昨晚大概九点多，我和几个朋友在机厅排着卡。林哲（就是Track_4，大家都认识）跟一个叫GALAXY的辉神（现在maiPro统计榜上第七名）双打连刷紫潘。前面三把都正常，他状态很好，绝赞小p都在两三个左右。到了<strong>第四首</strong>，林哲终于打出了理论值，一个绝赞都没小，完美得不能再完美。1P那边已经弹出结算画面了，大家正准备一齐欢呼。</p>
+            <p>然后诡异的事情来了——2P机台突然跳出了<strong>TRACK 05</strong>。</p>
+            <p>在场所有人都愣了。大伙都知道，这正常机台一局最多四首，况且还是赛事用机，哪来的第五首？我们都以为是自己看错了，但屏幕上的确写着TRACK 05，而且直接跳到了选曲界面。林哲当时表情有点奇怪，但也不是惊讶，就是那种很恍惚的样子，像没睡醒似的。有人喊他别打了先拍个照，他跟没听见一样，又选了紫潘，点了开始。</p>
+            <p>TRACK 05进行到结尾的时候，所有人都傻了。最后的<strong>双押WiFi星星</strong>林哲明明划得干干净净，这台机子也从来没吃过音，但屏幕上硬是弹出了两个<strong>Miss</strong>。这还不算完，紧接着的<strong>两个绝赞双押</strong>，虽然他开的是100.0000+记分，但分数明显涨得不合理，像是有人在后台直接改数据一样，窜到了一个所有人都想不到的数字。</p>
+            <p>整个机厅都安静了。<strong style="color:#ff4d4d; font-size:16px;">101.4401%</strong>，比理论值还高。屏幕上的分数字体变成了那种暗红色，旁边有人掏出手机想拍照，结果拍出来全是糊的，像是被什么东西干扰了一样。</p>
+            <p>林哲盯着那个数字看了大概两三秒，然后整个人直直地往后倒了下去，后脑勺磕在长椅上，还好长椅有海绵包边，不然估计要出人命。我们赶紧叫了救护车，医护人员来的时候他已经彻底没意识了。后来听说送到医院到现在还没醒。</p>
+            <p>那台#0044-A的机子后来被撤走了，说是要检修。但我总觉得这事没那么简单。TRACK 05从哪来的？那两个星星为什么判定成Miss？101.4401%是怎么出来的？林哲为什么到现在还醒不过来？</p>
+            <p>越想越觉得离谱。有没有懂行的分析一下？</p>
+        </div>
+    `,
+    shironeko: `
+        <div class="post-title">🏆 白XX全国首杀！！</div>
+        <div class="post-meta">发布者：被消化道分成两半的二维人 &nbsp;|&nbsp; 2026-07-01</div>
+        <div class="post-body">
+            <p style="color:#888;">我草，我真没想到国内首杀居然是他！速来围观！【【全国首杀】Xaleid◆scopiX Re：MASTER Lv.15 All Perfect-哔哩哔哩】 https://b23.tv/mdsTmmX</p>
+        </div>
+    `
+};
+
+function loadPost(postId) {
+    const area = document.getElementById('post-content-area');
+    if (!postContents[postId]) {
+        area.innerHTML = '<p style="color:#888;">帖子数据缺失。</p>';
+        return;
+    }
+    area.innerHTML = postContents[postId];
+
+    // 清除之前的定时器
+    if (metaTimer) {
+        clearTimeout(metaTimer);
+        metaTimer = null;
+    }
+
+    // 特殊帖子：5秒后闪烁并替换发布时间
+    if (postId === 'pandora' || postId === 'shironeko') {
+        metaTimer = setTimeout(() => {
+            const metaEl = document.querySelector('#post-content-area .post-meta');
+            if (!metaEl) return;
+            // 添加闪烁类
+            metaEl.classList.add('meta-blink');
+            // 2秒后替换文本并移除闪烁类
+            setTimeout(() => {
+                if (postId === 'pandora') {
+                    metaEl.textContent = 'S2V5MTpJRD1GaU5BTEVicG09bWF4';
+                } else if (postId === 'shironeko') {
+                    metaEl.textContent = 'S2V5MjpJRD1GaU5BTEVicmVhay9SZU09bWlu';
+                }
+                metaEl.classList.remove('meta-blink');
+                metaEl.style.color = '#ff0000'; // 保持红色
+            }, 2000);
+        }, 5000);
+    }
+}
+
+function initForumDefault() {
+    loadPost('announcement');
+}
+
+function showPermDenied() {
+    document.getElementById('perm-denied-overlay').style.display = 'flex';
+}
+
+function closePermDenied() {
+    document.getElementById('perm-denied-overlay').style.display = 'none';
+}
+
+function showLoginModal() {
+    document.getElementById('login-modal').style.display = 'flex';
+}
+
+function closeLoginModal() {
+    document.getElementById('login-modal').style.display = 'none';
+}
+
+// 管理员登录验证
+function verifyAdminLogin() {
+    const username = document.getElementById('admin-user').value.trim();
+    const password = document.getElementById('admin-pass').value.trim();
+    if (username === 'Symphony_Admin' && password === '799803') {
+        closeLoginModal();
+        alert("管理员凭证正确。\n搜索栏权限已解锁，您现在可以检索内部档案。");
+        // 解锁搜索栏
+        const searchBtn = document.getElementById('hcs-search-btn');
+        searchBtn.onclick = doSearch;
+        searchBtn.textContent = "搜索 (已授权)";
+        // 更新登录区域显示
+        document.getElementById('btn-login').textContent = 'Symphony_Admin';
+        document.getElementById('btn-login').style.color = '#4dff4d';
+        document.getElementById('btn-login').onclick = null; // 防止重复登录
+    } else {
+        alert("❌ 管理员认证失败。请核对凭证。");
+    }
+}
+
+// 解锁后的搜索功能（暂时占位）
+function doSearch() {
+    const query = document.getElementById('hcs-search-input').value.trim();
+    if (!query) return;
+    alert("搜索功能即将开放。\n待检索条目：" + query + "\n（数据库接口准备中...）");
+}
+
+// 导航标签点击
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', function(e) {
+        const tabName = this.dataset.tab;
+        if (tabName === 'forum') {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+        } else {
+            alert('【' + tabName + '】板块暂停服务。\nH.C.Symphony 维护期间仅论坛公告可访问。');
+        }
+    });
+});
+
+// 注册按钮
+document.getElementById('btn-register').addEventListener('click', function(e) {
+    e.preventDefault();
+    alert('注册功能已暂停。请使用管理员分配的凭证登录。');
+});
+
+// 防止点击权限弹窗内部关闭
+document.querySelector('.permission-denied-box').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
+</script>
+</body>
+</html>

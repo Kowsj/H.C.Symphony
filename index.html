@@ -86,7 +86,7 @@
             background-color: #0096b6;
         }
 
-        /* ================= 以下为原网站全部样式（保持不动） ================= */
+        /* ================= 原网站样式 ================= */
         header {
             background-color: #000;
             padding: 15px 30px;
@@ -189,7 +189,8 @@
             color: #8a8f98;
             letter-spacing: 1px;
         }
-        .hcs-search {
+        .hcs-search-wrapper {
+            position: relative;
             display: flex;
             align-items: center;
             gap: 5px;
@@ -198,7 +199,7 @@
             padding: 4px 10px;
             border: 1px solid #333;
         }
-        .hcs-search input {
+        .hcs-search-wrapper input {
             background: transparent;
             border: none;
             color: #ccc;
@@ -207,7 +208,7 @@
             font-size: 14px;
             outline: none;
         }
-        .hcs-search button {
+        .hcs-search-wrapper button {
             background: #3a3f48;
             border: none;
             color: #ccc;
@@ -216,7 +217,38 @@
             cursor: pointer;
             font-weight: bold;
         }
-        .hcs-search button:hover { background: #505763; }
+        .hcs-search-wrapper button:hover { background: #505763; }
+        .search-history-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: #1a1d24;
+            border: 1px solid #333;
+            border-radius: 0 0 4px 4px;
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .search-history-dropdown.show {
+            display: block;
+        }
+        .search-history-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            color: #aaa;
+            font-size: 13px;
+            border-bottom: 1px solid #222;
+            transition: 0.2s;
+        }
+        .search-history-item:hover {
+            background: #252a33;
+            color: #fff;
+        }
+        .search-history-item:last-child {
+            border-bottom: none;
+        }
         .hcs-user-actions {
             display: flex;
             gap: 15px;
@@ -363,6 +395,72 @@
             font-weight: bold;
             margin-top: 20px;
         }
+
+        /* Archive Unlocked 全屏覆盖 */
+        .fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #000;
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .fullscreen-overlay .archive-text {
+            font-size: 48px;
+            font-weight: bold;
+            color: #d90429;
+            font-family: 'Courier New', monospace;
+            animation: crimson-glitch 0.15s linear infinite;
+        }
+
+        /* 陈星抖动页 */
+        .jitter-page {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #0a0000;
+            z-index: 99999;
+            overflow: hidden;
+            cursor: default;
+        }
+        .jitter-text-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .jitter-word {
+            color: #ff0000;
+            font-weight: bold;
+            margin: 5px 8px;
+            animation: jitter-shake 0.1s linear infinite;
+            text-shadow: 0 0 10px rgba(255,0,0,0.8);
+            user-select: none;
+        }
+        @keyframes jitter-shake {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-3px, 2px); }
+            50% { transform: translate(2px, -3px); }
+            75% { transform: translate(-1px, -1px); }
+            100% { transform: translate(1px, 3px); }
+        }
+
+        /* STATION 闪烁 */
+        #btn-login.station-mode {
+            animation: station-blink 0.8s linear infinite;
+        }
+        @keyframes station-blink {
+            0%, 100% { color: #ff0000; opacity: 1; }
+            50% { color: #ff4444; opacity: 0.6; }
+        }
     </style>
 </head>
 <body>
@@ -371,26 +469,19 @@
 <div id="start-page">
     <div class="start-card">
         <h1>H.C.Symphony</h1>
-
         <p>你叫陈星，一名普通但计算机知识过硬的舞萌玩家。</p>
-
-        <p>你的挚友<strong>林哲</strong>（网名 Track4）是国内顶尖 Ranker。可就在两天前，你收到了他游玩舞萌过程中<strong>昏迷送医</strong>的消息，并得知了整件事情的诡异经过……
-
+        <p>你的挚友<strong>林哲</strong>（网名 Track4）是国内顶尖 Ranker。可就在两天前，你收到了他游玩舞萌过程中<strong>昏迷送医</strong>的消息，并得知了整件事情的诡异经过……</p>
         <p>你想起林哲曾托你帮忙在<strong>maiPro</strong>官方统计系统上传成绩，告诉过你密码——是他<strong>姓名的拼音</strong>。</p>
-
         <p>利用某个程序漏洞，你成功以林哲的身份登录并同时潜入系统后台……你决定从检索栏入手，一步步揭开这桩诡异事件的真相。</p>
-
         <div class="divider"></div>
-
         <p class="notes">📌 游玩提示：<br>
         1. 仅需对舞萌 DX 有一定了解，无需专业编程知识。<br>
         2. 善用 Easymai、浏览器等工具辅助解谜。</p>
-
         <a class="start-btn" onclick="startGame()">▶ 开始调查</a>
     </div>
 </div>
 
-<!-- ================= 以下原封不动：表层网站 + 终端 + 论坛 ================= -->
+<!-- ================= 表层网站 + 终端 + 论坛 ================= -->
 <div id="normal-website" style="display:none;">
     <header>
         <div class="logo">mai<span>Pro</span> Archive</div>
@@ -480,9 +571,10 @@
             <span class="cn">硬核交响</span>
             <span class="en">H.C.Symphony</span>
         </div>
-        <div class="hcs-search">
-            <input type="text" id="hcs-search-input" placeholder="搜索帖子、资源...">
+        <div class="hcs-search-wrapper">
+            <input type="text" id="hcs-search-input" placeholder="搜索帖子、资源..." onfocus="showSearchHistory()" onblur="setTimeout(() => hideSearchHistory(), 200)" onkeypress="if(event.keyCode==13) doSearch()">
             <button id="hcs-search-btn" onclick="showPermDenied()">搜索</button>
+            <div id="search-history-dropdown" class="search-history-dropdown"></div>
         </div>
         <div class="hcs-user-actions">
             <a id="btn-register" style="color:#555; cursor:not-allowed;" title="暂停注册">注册</a>
@@ -503,15 +595,13 @@
             <ul class="hcs-hot-list">
                 <li class="clickable" onclick="loadPost('announcement')">· 公告：HCS本站功能维护中，短期内暂停使用</li>
                 <li class="disabled" title="暂时无法查看">· 舞萌DX2026海选赛赛程暂缓</li>
-                <li class="disabled" title="暂时无法查看">· 舞萌海选赛指定机台频繁故障</li>
+                <li class="clickable" onclick="loadPost('machine_fault')">· 舞萌海选赛指定机台频繁故障</li>
                 <li class="clickable" onclick="loadPost('pandora')">· 紫潘事件全程回顾</li>
                 <li class="clickable" onclick="loadPost('shironeko')">· 白XX全国首杀！！</li>
             </ul>
         </div>
 
-        <div class="hcs-content" id="post-content-area">
-            <!-- 动态载入帖子内容 -->
-        </div>
+        <div class="hcs-content" id="post-content-area"></div>
     </div>
 
     <!-- 权限不足弹窗 -->
@@ -554,7 +644,6 @@ function checkPlayer() {
     const idInput = document.getElementById('player-id').value.trim();
     const pwdInput = document.getElementById('player-pwd').value.trim();
     const msgBox = document.getElementById('msg-box');
-    
     if (idInput === 'Track_4' && pwdInput === 'linzhe') {
         msgBox.innerHTML = "<span class='success'>⚡ 凭证匹配，正在载入中心机台备份日志流...</span>";
         document.body.classList.add('glitch-screen');
@@ -575,7 +664,6 @@ const keywordMapping = {
     "track5": "link_t5", "track 05": "link_t5", "track05": "link_t5", "track_05": "link_t5",
     "slide_wifi_both": "link_wifi", "wifi": "link_wifi"
 };
-
 const logContentDetails = {
     "link_0044": `<span class='system-alert'>[SYS_ERR] DEVICE_ID: #0044-A (2026-07-07 23:11:04)</span><br>
                   <div class='code-block'>
@@ -592,7 +680,6 @@ const logContentDetails = {
                   IO_STATUS: [Button 1-8: OK] [Slide_Sensor: STUCK_ON_SPECIAL_PATTERN]<br>
                   NET_STATUS: Network stream isolated by remote host control protocol.
                   </div>`,
-                  
     "link_t5": `<span class='system-alert'>[SYS_PATCH] SYSTEM_FIRMWARE_HOOK_REPORT (TRACK_05_AUDIT)</span><br>
                 <div class='code-block'>
                 检测到针对游戏结算轨道的底层越权注入。<br>
@@ -604,7 +691,6 @@ const logContentDetails = {
                 <input type='text' id='chart-pwd' placeholder='输入解析后的触控区判定密匙 (不分大小写)...' style='background:#000; color:#00d2ff; border:1px solid #00d2ff; padding:8px; margin-top:10px; width:350px; font-family:monospace;'>
                 <button onclick='verifyChartPwd()' style='padding:8px 15px; background:#00d2ff; color:#000; font-weight:bold; cursor:pointer; font-family:monospace;'>SUBMIT</button>
                 </div>`,
-                
     "link_wifi": `<span class='system-alert'>[AUDIT_LOG] SLIDE_WIFI_BOTH_OBJECT.CONF</span><br>
                    <div class='code-block'>
                    [TRACK_STREAM_INFO]: 谱面物理流异常。监测到针对底层判定的强行阻断。<br>
@@ -644,14 +730,13 @@ function restoreList() {
     document.getElementById('log-screen').innerHTML = "[SYSTEM]: 已返回。请重新输入关键词或机台号进行深层过滤。"; 
 }
 
-// ---------- 里层触发器（星星判定区密码验证） ----------
+// ---------- 里层触发器 ----------
 function verifyChartPwd() {
     const pwd = document.getElementById('chart-pwd').value.trim().toUpperCase();
     if (pwd === 'BA3A6' || pwd === 'A3A6B') {
         const termSys = document.getElementById('terminal-system');
         termSys.innerHTML = "<h2 style='color:#ff4d4d; font-size:24px; text-align:center; margin-top:150px; animation:glitch 0.2s infinite;'>[CRITICAL WARNING]<br>UNKNOWN INTRUSION DETECTED.<br>OVERRIDING LOCAL LOGS...</h2>";
         document.body.classList.add('crimson-glitch');
-        
         setTimeout(() => {
             document.body.classList.remove('crimson-glitch');
             termSys.style.display = 'none';
@@ -667,6 +752,8 @@ function verifyChartPwd() {
 
 // ---------- 硬核交响论坛逻辑 ----------
 let metaTimer = null;
+let searchHistory = [];
+let isStationMode = false;
 
 const postContents = {
     announcement: `
@@ -676,7 +763,7 @@ const postContents = {
             <p>致各位核心成员及访客：</p>
             <p>因近期外部网络环境异常，本站（硬核交响 H.C.Symphony）将于即日起进入<strong style="color:#ff9900;">紧急维护状态</strong>。论坛发帖、资源下载、资讯板块全部功能暂时关闭，恢复时间待定。</p>
             <p>在此期间，所有公开访问均将被重定向至本公告页面。如需获取内部通讯，请使用<strong style="color:var(--symphony-red);">管理员凭证</strong>通过认证节点接入。</p>
-            <p>对于正在跟进<strong style="color:var(--symphony-red);">激活计划</strong>的各位同仁，请保持静默，避免在非加密信道讨论项目细节。</p>
+            <p>对于正在跟进<strong style="color:var(--symphony-red);">共振计划</strong>的各位同仁，请保持静默，避免在非加密信道讨论项目细节。</p>
             <p style="color:#666;">—— H.C.Symphony 管理署</p>
         </div>
     `,
@@ -699,7 +786,54 @@ const postContents = {
         <div class="post-title">🏆 白XX全国首杀！！</div>
         <div class="post-meta">发布者：被消化道分成两半的二维人 &nbsp;|&nbsp; 2026-07-01</div>
         <div class="post-body">
-            <p style="color:#888;">我草，我真没想到国内首杀居然是他！速来围观！【【全国首杀】Xaleid◆scopiX Re：MASTER Lv.15 All Perfect-哔哩哔哩】 https://b23.tv/mdsTmmX</p>
+            <p style="color:#888;">我草，我真没想到国内首杀居然是他！速来围观！【【全国首杀】Xaleid◆scopiX Re：MASTER Lv.15 All Perfect-哔哩哔哩】 https://b23.tv/BoldcxP</p>
+        </div>
+    `,
+    machine_fault: `
+        <div class="post-title">⚠️ 舞萌海选赛指定机台频繁故障</div>
+        <div class="post-meta">发布者：修不好别修了 &nbsp;|&nbsp; 2026-07-03 16:20</div>
+        <div class="post-body">
+            <p>不是，有没有人管管海选赛的机台啊？今天又崩了两台。</p>
+            <p>我知道最近赛事方把几台机子划成了指定用机，但自从海选赛开始之后这些机子就没消停过。我挨个说吧：</p>
+            <p><strong>#0044-A</strong>——就是林哲出事那台，现在已经彻底封存了。出事的头两天就开始各种不对劲，闪屏、掉帧、甚至有一次卡在选曲界面怎么点都没反应，当时就有人开玩笑说这机子是不是被下了降头。谁能想到后来真出大事了。</p>
+            <p><strong>#0012-B</strong>——上周末连崩三次，有局打着打着画面直接灰了，成绩也没上传成功，好几个选手的纪录直接作废。店长说是电源问题，换了根线照样崩。</p>
+            <p><strong>#0021-C</strong>——昨天有个熟人玩着玩着，触屏突然失灵了大概五秒钟，等他反应过来屏幕又好了，结算的时候判了好几个莫名其妙的Good。他气得差点砸机子。</p>
+            <p><strong>#0041-C</strong>——这台最离谱，据说有人打的时候听到了奇怪的电流声，不是音响发出来的，是屏幕后面那种滋滋的声音，像什么东西在叫。后来检修的人说电路板好好的，找不到问题。</p>
+            <p>以上这几台全是海选赛指定用机，没有一台是没出过毛病的。</p>
+            <p>官方到现在也没个说法，就说是"正常检修维护"。正常个屁啊，哪家机厅一周修五次的？而且每次出问题的都是指定机台，其他普通机子一点事没有。</p>
+            <p>有人说是不是机台被人动了手脚，也有人说是赛事方自己改了什么设置，反正说什么的都有。我是不太懂技术，但这么多巧合凑在一起，怎么想都不正常。</p>
+            <p>有没有人知道内情的？或者说你们那边机台也出问题了？</p>
+            <p style="color:#666; font-size:12px; margin-top:20px;">（补充：刚听说赛事方准备停用所有指定机台，不知道是真是假。要是真停了，这海选赛还怎么比？）</p>
+        </div>
+    `,
+    hcs_normal: `
+        <div class="post-title">🎵 全国音游网「硬核交响」正式开启运营！</div>
+        <div class="post-meta">发布者：HCS_Official &nbsp;|&nbsp; 2024-03-15 10:00</div>
+        <div class="post-body">
+            <p>各位音游同好，大家好！</p>
+            <p>经过半年的筹备，<strong>全国音游网「硬核交响」（H.C.Symphony）</strong>今日正式上线运营！</p>
+            <p>本站致力于打造一个<strong>纯粹、硬核</strong>的音游交流社区，涵盖舞萌DX、CHUNITHM、太鼓达人、SDVX等多款热门街机音游。无论你是刚入坑的新人，还是冲击全国排名的老玩家，这里都有你的一席之地。</p>
+            <p><strong>目前开放的功能：</strong></p>
+            <p>📌 论坛交流——分版块讨论各类音游，分享攻略、手元、心得。<br>
+            📌 资讯速递——第一时间同步官方更新、赛事动态。<br>
+            📌 资源下载——谱面文件、模拟器、工具合集持续更新中。</p>
+            <p>后续我们还会推出<strong>Ranker专访栏目</strong>和<strong>线下聚会活动</strong>，敬请期待。</p>
+            <p>注册完全免费，欢迎加入硬核交响的大家庭！</p>
+            <p style="color:#666;">—— H.C.Symphony 运营团队</p>
+        </div>
+    `,
+    resonance_project: `
+        <div class="post-title">🔴 「共振计划」档案</div>
+        <div class="post-meta">发布者：STATION &nbsp;|&nbsp; 密级：最高</div>
+        <div class="post-body">
+            <p style="color:#888;">[ 该档案内容待补充... ]</p>
+        </div>
+    `,
+    grand_world: `
+        <div class="post-title">🌐 盛大世界</div>
+        <div class="post-meta">发布者：STATION &nbsp;|&nbsp; 密级：最高</div>
+        <div class="post-body">
+            <p style="color:#888;">[ 该档案内容待补充... ]</p>
         </div>
     `
 };
@@ -711,23 +845,15 @@ function loadPost(postId) {
         return;
     }
     area.innerHTML = postContents[postId];
-
-    if (metaTimer) {
-        clearTimeout(metaTimer);
-        metaTimer = null;
-    }
-
+    if (metaTimer) { clearTimeout(metaTimer); metaTimer = null; }
     if (postId === 'pandora' || postId === 'shironeko') {
         metaTimer = setTimeout(() => {
             const metaEl = document.querySelector('#post-content-area .post-meta');
             if (!metaEl) return;
             metaEl.classList.add('meta-blink');
             setTimeout(() => {
-                if (postId === 'pandora') {
-                    metaEl.textContent = 'S2V5MTpJRD1GaU5BTEVicG09bWF4';
-                } else if (postId === 'shironeko') {
-                    metaEl.textContent = 'S2V5MjpJRD1GaU5BTEVicmVhay9SZU09bWlu';
-                }
+                if (postId === 'pandora') metaEl.textContent = 'S2V5MTpJRD1GaU5BTEVicG09bWF4';
+                else if (postId === 'shironeko') metaEl.textContent = 'S2V5MjpJRD1GaU5BTEVicmVhay9SZU09bWlu';
                 metaEl.classList.remove('meta-blink');
                 metaEl.style.color = '#ff0000';
             }, 2000);
@@ -735,25 +861,11 @@ function loadPost(postId) {
     }
 }
 
-function initForumDefault() {
-    loadPost('announcement');
-}
-
-function showPermDenied() {
-    document.getElementById('perm-denied-overlay').style.display = 'flex';
-}
-
-function closePermDenied() {
-    document.getElementById('perm-denied-overlay').style.display = 'none';
-}
-
-function showLoginModal() {
-    document.getElementById('login-modal').style.display = 'flex';
-}
-
-function closeLoginModal() {
-    document.getElementById('login-modal').style.display = 'none';
-}
+function initForumDefault() { loadPost('announcement'); }
+function showPermDenied() { document.getElementById('perm-denied-overlay').style.display = 'flex'; }
+function closePermDenied() { document.getElementById('perm-denied-overlay').style.display = 'none'; }
+function showLoginModal() { document.getElementById('login-modal').style.display = 'flex'; }
+function closeLoginModal() { document.getElementById('login-modal').style.display = 'none'; }
 
 function verifyAdminLogin() {
     const username = document.getElementById('admin-user').value.trim();
@@ -772,10 +884,87 @@ function verifyAdminLogin() {
     }
 }
 
+// ================= 搜索系统 =================
+function showSearchHistory() {
+    const dropdown = document.getElementById('search-history-dropdown');
+    if (searchHistory.length > 0) {
+        dropdown.innerHTML = searchHistory.map(h => 
+            `<div class="search-history-item" onmousedown="event.preventDefault(); document.getElementById('hcs-search-input').value='${h.replace(/'/g, "\\'")}'; hideSearchHistory(); doSearch();">${h}</div>`
+        ).join('');
+        dropdown.classList.add('show');
+    }
+}
+function hideSearchHistory() { document.getElementById('search-history-dropdown').classList.remove('show'); }
+function addSearchHistory(query) {
+    searchHistory = searchHistory.filter(h => h.toLowerCase() !== query.toLowerCase());
+    searchHistory.unshift(query);
+    if (searchHistory.length > 10) searchHistory.pop();
+}
+
+function showErrorOverlay(msg) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:99999;display:flex;justify-content:center;align-items:center;';
+    overlay.innerHTML = `<div style="background:#1a0003;border:2px solid #ff0044;padding:40px;text-align:center;max-width:450px;color:#ff4466;font-family:'Courier New',monospace;animation:crimson-glitch 0.15s linear infinite;"><h2>⚠ 访问被拒绝</h2><p>${msg}</p><button onclick="this.closest('div').parentElement.remove()" style="background:#33000a;border:1px solid #ff0044;color:#ff4466;padding:10px 25px;cursor:pointer;font-weight:bold;margin-top:20px;">返回</button></div>`;
+    document.body.appendChild(overlay);
+}
+
+function triggerArchiveUnlocked() {
+    const overlay = document.createElement('div');
+    overlay.className = 'fullscreen-overlay';
+    overlay.innerHTML = '<div class="archive-text">Archive Unlocked</div>';
+    overlay.style.display = 'flex';
+    document.body.appendChild(overlay);
+    isStationMode = true;
+    const loginBtn = document.getElementById('btn-login');
+    loginBtn.textContent = 'STATION';
+    loginBtn.style.color = '#ff0000';
+    loginBtn.classList.add('station-mode');
+    setTimeout(() => overlay.remove(), 2000);
+}
+
+function triggerJitterPage() {
+    const page = document.createElement('div');
+    page.className = 'jitter-page';
+    page.style.display = 'block';
+    const container = document.createElement('div');
+    container.className = 'jitter-text-container';
+    const sizes = [14, 18, 22, 28, 36, 48, 16, 20, 32, 40];
+    for (let i = 0; i < 150; i++) {
+        const word = document.createElement('span');
+        word.className = 'jitter-word';
+        word.textContent = '下一个就是你';
+        word.style.fontSize = sizes[Math.floor(Math.random() * sizes.length)] + 'px';
+        word.style.animationDelay = (Math.random() * 0.1) + 's';
+        word.style.animationDuration = (0.05 + Math.random() * 0.15) + 's';
+        container.appendChild(word);
+    }
+    page.appendChild(container);
+    document.body.appendChild(page);
+    setTimeout(() => page.remove(), 4000);
+}
+
 function doSearch() {
     const query = document.getElementById('hcs-search-input').value.trim();
     if (!query) return;
-    alert("搜索功能即将开放。\n待检索条目：" + query + "\n（数据库接口准备中...）");
+    addSearchHistory(query);
+    hideSearchHistory();
+    const qLower = query.toLowerCase();
+
+    if (qLower.includes('0044')) { loadPost('machine_fault'); return; }
+    if (qLower === '陈星') { triggerJitterPage(); return; }
+    if (qLower === '硬核交响' || qLower === 'h.c.symphony') { loadPost('hcs_normal'); return; }
+    if (qLower === 'symphony') { triggerArchiveUnlocked(); return; }
+    if (qLower === '林哲' || qLower === 'track_4') {
+        if (!isStationMode) showErrorOverlay('[SEC_ERR] 当前安全等级不足以访问该档案。<br>请确认您已获得正确的授权凭证。<br><br>H.C.Symphony 安全协议 v4.1');
+        else loadPost('resonance_project');
+        return;
+    }
+    if (qLower === '共振计划') {
+        if (!isStationMode) showErrorOverlay('[SEC_ERR] 当前安全等级不足以访问该档案。<br>请确认您已获得正确的授权凭证。<br><br>H.C.Symphony 安全协议 v4.1');
+        else loadPost('grand_world');
+        return;
+    }
+    alert('未找到与 "' + query + '" 相关的结果。');
 }
 
 document.querySelectorAll('.nav-tab').forEach(tab => {

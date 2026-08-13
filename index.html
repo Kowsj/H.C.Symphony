@@ -364,11 +364,14 @@
 <script>
 // ================= Hash 路由系统 =================
 function navigateTo(route) {
+    // 如果 hash 不一样，更新地址栏，但不依赖 hashchange 事件
     if (location.hash !== '#' + route) {
-        location.hash = route;
-    } else {
-        applyRoute(route);
+        history.pushState(null, '', '#' + route);
     }
+    // 立即切换页面
+    applyRoute(route);
+    // 备份当前路由，防止刷新时 hash 丢失
+    sessionStorage.setItem('arg_current_route', route);
 }
 
 function applyRoute(route) {
@@ -438,9 +441,33 @@ function restoreState() {
 
 window.addEventListener('load', () => {
     restoreState();
-    handleRoute();
+
+    // 优先从 sessionStorage 恢复上次停留的页面
+    const savedRoute = sessionStorage.getItem('arg_current_route');
+    const hashRoute = location.hash.replace('#', '');
+    const initialRoute = savedRoute || hashRoute || 'start';
+
+    const validRoutes = ['start', 'home', 'rank', 'terminal', 'forum'];
+    if (validRoutes.includes(initialRoute)) {
+        applyRoute(initialRoute);
+        // 同步地址栏
+        if (location.hash !== '#' + initialRoute) {
+            history.replaceState(null, '', '#' + initialRoute);
+        }
+    } else {
+        applyRoute('start');
+    }
 });
-window.addEventListener('hashchange', handleRoute);
+
+// 监听浏览器前进/后退（popstate 对 hash 也生效）
+window.addEventListener('popstate', () => {
+    const route = location.hash.replace('#', '') || 'start';
+    const validRoutes = ['start', 'home', 'rank', 'terminal', 'forum'];
+    if (validRoutes.includes(route)) {
+        applyRoute(route);
+        sessionStorage.setItem('arg_current_route', route);
+    }
+});
 
 // ================= 起始页跳转 =================
 function startGame() {

@@ -147,10 +147,59 @@
         .fullscreen-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; justify-content: center; align-items: center; }
         .fullscreen-overlay .archive-text { font-size: 48px; font-weight: bold; color: #d90429; font-family: 'Courier New', monospace; animation: crimson-glitch 0.15s linear infinite; }
 
-        .jitter-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0000; z-index: 99999; overflow: hidden; }
-        .jitter-text-container { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; box-sizing: border-box; }
-        .jitter-word { color: #ff0000; font-weight: bold; margin: 5px 8px; animation: jitter-shake 0.1s linear infinite; text-shadow: 0 0 10px rgba(255,0,0,0.8); user-select: none; }
-        @keyframes jitter-shake { 0% { transform: translate(0, 0); } 25% { transform: translate(-3px, 2px); } 50% { transform: translate(2px, -3px); } 75% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, 3px); } }
+        .jitter-page {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, #1a0000 0%, #000000 80%);
+            z-index: 99999;
+            overflow: hidden;
+            animation: background-pulse 1.5s ease-in-out infinite;
+            border: 3px solid #ff0000;
+            box-sizing: border-box;
+            box-shadow: inset 0 0 80px rgba(255, 0, 0, 0.7), 0 0 80px rgba(255, 0, 0, 0.5);
+        }
+        @keyframes background-pulse {
+            0%   { background-color: #1a0000; }
+            50%  { background-color: #2a0000; }
+            100% { background-color: #1a0000; }
+        }
+        .jitter-text-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            filter: blur(0.3px);
+        }
+        .jitter-word {
+            color: #ff0000;
+            font-weight: bold;
+            margin: 5px 8px;
+            animation: jitter-shake 0.1s linear infinite, word-pulse 0.5s ease-in-out infinite alternate;
+            text-shadow:
+                0 0 10px rgba(255, 0, 0, 0.9),
+                0 0 20px rgba(255, 0, 0, 0.7),
+                -2px 0 4px rgba(255, 0, 0, 0.6),
+                2px 0 4px rgba(255, 0, 0, 0.6);
+            user-select: none;
+            transform-origin: center;
+        }
+        @keyframes jitter-shake {
+            0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+            25%  { transform: translate(-6px, 4px) scale(1.1) rotate(-3deg); }
+            50%  { transform: translate(5px, -6px) scale(0.95) rotate(2deg); }
+            75%  { transform: translate(-3px, -2px) scale(1.05) rotate(-1deg); }
+            100% { transform: translate(2px, 5px) scale(1) rotate(3deg); }
+        }
+        @keyframes word-pulse {
+            0%   { color: #ff0000; text-shadow: 0 0 10px rgba(255,0,0,0.9), 0 0 20px rgba(255,0,0,0.7); }
+            100% { color: #aa0000; text-shadow: 0 0 20px rgba(255,0,0,1), 0 0 40px rgba(255,0,0,0.9); }
+        }
 
         #btn-login.station-mode { animation: station-blink 0.8s linear infinite; }
         @keyframes station-blink { 0%, 100% { color: #ff0000; opacity: 1; } 50% { color: #ff4444; opacity: 0.6; } }
@@ -283,7 +332,6 @@
             <ul class="hcs-hot-list">
                 <li class="clickable" onclick="loadPost('announcement')">· 公告：HCS本站功能维护中，短期内暂停使用</li>
                 <li class="disabled" title="暂时无法查看">· 舞萌DX2026海选赛赛程暂缓</li>
-                <!-- 下面这条改为不可点击，只能通过搜索查看 -->
                 <li class="disabled" title="只能通过搜索查看">· 舞萌海选赛指定机台频繁故障</li>
                 <li class="clickable" onclick="loadPost('pandora')">· 紫潘事件全程回顾</li>
                 <li class="clickable" onclick="loadPost('shironeko')">· 白XX全国首杀！！</li>
@@ -314,15 +362,93 @@
 </div>
 
 <script>
+// ================= Hash 路由系统 =================
+function navigateTo(route) {
+    if (location.hash !== '#' + route) {
+        location.hash = route;
+    } else {
+        applyRoute(route);
+    }
+}
+
+function applyRoute(route) {
+    const startPage = document.getElementById('start-page');
+    const normalWebsite = document.getElementById('normal-website');
+    const terminalSystem = document.getElementById('terminal-system');
+    const hcsForum = document.getElementById('hcs-forum');
+
+    startPage.style.display = 'none';
+    normalWebsite.style.display = 'none';
+    terminalSystem.style.display = 'none';
+    hcsForum.style.display = 'none';
+
+    if (route === 'start') {
+        startPage.style.display = 'flex';
+        document.body.style.backgroundColor = '#121212';
+    } else if (route === 'home' || route === 'rank') {
+        normalWebsite.style.display = 'block';
+        document.body.style.backgroundColor = '#121212';
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        if (route === 'home') {
+            document.getElementById('page-home').classList.add('active-page');
+        } else {
+            document.getElementById('page-rank').classList.add('active-page');
+        }
+    } else if (route === 'terminal') {
+        terminalSystem.style.display = 'block';
+        document.body.style.backgroundColor = '#050505';
+    } else if (route === 'forum') {
+        hcsForum.style.display = 'block';
+        document.body.style.backgroundColor = '#0a0c0f';
+        const postArea = document.getElementById('post-content-area');
+        if (!postArea || !postArea.innerHTML.trim()) {
+            initForumDefault();
+        }
+    }
+}
+
+function handleRoute() {
+    const hash = location.hash.replace('#', '') || 'start';
+    const validRoutes = ['start', 'home', 'rank', 'terminal', 'forum'];
+    if (!validRoutes.includes(hash)) {
+        navigateTo('start');
+    } else {
+        applyRoute(hash);
+    }
+}
+
+function restoreState() {
+    if (sessionStorage.getItem('arg_station_mode') === 'true') {
+        isStationMode = true;
+        const loginBtn = document.getElementById('btn-login');
+        loginBtn.textContent = 'STATION';
+        loginBtn.style.color = '#ff0000';
+        loginBtn.classList.add('station-mode');
+    }
+    if (sessionStorage.getItem('arg_admin_logged_in') === 'true') {
+        const searchBtn = document.getElementById('hcs-search-btn');
+        searchBtn.onclick = doSearch;
+        searchBtn.textContent = "搜索 (已授权)";
+        const btnLogin = document.getElementById('btn-login');
+        btnLogin.textContent = sessionStorage.getItem('arg_admin_name') || 'Symphony_Admin';
+        btnLogin.style.color = '#4dff4d';
+        btnLogin.onclick = null;
+    }
+}
+
+window.addEventListener('load', () => {
+    restoreState();
+    handleRoute();
+});
+window.addEventListener('hashchange', handleRoute);
+
+// ================= 起始页跳转 =================
 function startGame() {
-    document.getElementById('start-page').style.display = 'none';
-    document.getElementById('normal-website').style.display = 'block';
+    navigateTo('home');
 }
 
 function switchPage(pageName) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-    if(pageName === 'home') document.getElementById('page-home').classList.add('active-page');
-    if(pageName === 'rank') document.getElementById('page-rank').classList.add('active-page');
+    navigateTo(pageName);
 }
 
 function checkPlayer() {
@@ -334,9 +460,7 @@ function checkPlayer() {
         document.body.classList.add('glitch-screen');
         setTimeout(() => {
             document.body.classList.remove('glitch-screen');
-            document.getElementById('normal-website').style.display = 'none';
-            document.getElementById('terminal-system').style.display = 'block';
-            document.body.style.backgroundColor = '#050505';
+            navigateTo('terminal');
         }, 1000);
     } else {
         msgBox.innerHTML = "<span class='error'>❌ 错误：认证失败。未在公开名单中找到该凭证。</span>";
@@ -421,9 +545,7 @@ function verifyChartPwd() {
         document.body.classList.add('crimson-glitch');
         setTimeout(() => {
             document.body.classList.remove('crimson-glitch');
-            termSys.style.display = 'none';
-            document.getElementById('hcs-forum').style.display = 'block';
-            document.body.style.backgroundColor = '#0a0c0f';
+            navigateTo('forum');
             alert("身份验证通过。\n管理员权限已授予。\n欢迎接入 H.C.Symphony 核心网络。");
             initForumDefault();
         }, 2000);
@@ -505,17 +627,121 @@ const postContents = {
         </div>
     `,
     resonance_project: `
-        <div class="post-title">「共振计划」档案</div>
-        <div class="post-meta">发布者：STATION &nbsp;|&nbsp; 密级：最高</div>
-        <div class="post-body">
-            <p style="color:#888;">[ 该档案内容待补充... ]</p>
-        </div>
+<div class="post-title">🔴 「共振计划」档案</div>
+<div class="post-meta">发布者：STATION &nbsp;|&nbsp; 密级：最高</div>
+<div class="post-body">
+    
+    <p>项目代号：<strong>共振计划（Project Activation）</strong><br>
+    所属机构：Symphony（级联交响乐管理署）<br>
+    计划状态：执行中<br>
+    当前阶段：第二阶段（全国海选赛筛选）</p>
+
+    <p><strong>一、计划目标</strong></p>
+    <p>在本世界人类群体中，筛选出脑波波长与观测者维度高度匹配的个体，将其转化为<strong>基站</strong>，用于放大跨维度信号，为观测者在本世界的长期干涉行动提供稳定媒介。</p>
+
+    <p><strong>二、筛选载体</strong></p>
+    <p>利用街机音游《maimai DX》的高强度谱面作为神经响应测试环境。其中，课题曲《PANDORA PARADOXXX》MASTER 难度已被植入特殊载波序列。只有能在该谱面中达成<strong>理论值（All Perfect+）</strong>的玩家，其脑电波才会与载波产生稳定共振，被系统标记为“潜在基站”。</p>
+
+    <p><strong>三、激活程序</strong></p>
+    <p>当潜在基站在指定机台上完成理论值后，系统将强制触发额外曲目<strong>TRACK 05</strong>。该曲目通过特定滑条判定异常（如双押WiFi星星强制 Miss）与绝赞分数异常飙升，向玩家脑内注入神经编码，建立初步意识连接。</p>
+    <p>激活成功后，个体意识将被逐步牵引至<strong>“盛大世界”</strong>，成为可被组织直接调用的信号源。</p>
+
+    <p><strong>四、当前进展</strong></p>
+    <p>截至发档前，本计划已成功标记 1 名个体：</p>
+    <p><strong>个体编号：Track_4</strong><br>
+    姓名：林哲<br>
+    状态：激活后信号过载，意识未完全接入，残留于机台网络中。<br>
+    处理：过滤器已介入，但未能完全清除其遗留数据。</p>
+    <p>另有大量未标记个体持续处于监测中，预计决赛阶段将完成大规模筛选。</p>
+
+    <p><strong>五、注意事项</strong></p>
+    <p>1. 所有基站候选数据均通过指定机台回传至 H.C.Symphony 服务器，禁止任何非授权访问。<br>
+    2. 若出现个体拒绝配合或认知异常，由<strong>覆写者</strong>或<strong>过滤器</strong>负责善后。<br>
+    3. 任何试图公开本计划的行为，都将被判定为最高等级威胁，并启动物理定位追踪。</p>
+
+    <p style="color:#ff4d4d; font-weight:bold;">[系统提示]：当前终端已越权访问本档案。请立即关闭页面，否则过滤器将执行记忆清除程序。</p>
+
+    <p style="color:#666; font-size:12px; margin-top:30px;">（档案结束。此页面禁止复制、截图或转发。）</p>
+</div>
     `,
     grand_world: `
-        <div class="post-title">盛大世界</div>
+        <div class="post-title">🌐 盛大世界</div>
+<div class="post-meta">发布者：STATION &nbsp;|&nbsp; 密级：最高</div>
+<div class="post-body">
+
+    <p><strong>个体编号：Track_4</strong><br>
+    姓名：林哲<br>
+    接入时间：2026-07-01 23:11:04<br>
+    接入模式：强制覆盖中<br>
+    意识完整度：约 64%<br>
+    当前状态：间歇性清醒，残留部分本世界记忆，已尝试向外传递信号</p>
+
+    <p>该个体在接入前通过非法程序将部分系统日志与密钥散落在 maiPro 节点中，试图引导外部人员介入。过滤器已介入清除，但未能完全覆盖其踪迹。</p>
+
+    <p>所有被标记为“潜在基站”的个体，都会在无意识状态下被持续监测。一旦脑波波长匹配达到阈值，系统将自动触发接入程序。届时，该个体将失去对本世界的大部分感知，进入盛大世界。</p>
+
+    <p style="color:#ff4d4d; font-weight:bold;">[警告]：当前终端使用者已被标记为潜在基站。请停止所有未经授权的访问行为。否则，过滤器将启动强制善后程序。</p>
+
+    <p style="color:#666; font-size:12px; margin-top:30px;">（档案结束。此页面禁止复制、截图或转发。系统将记录所有查看操作。）</p>
+</div>
+    `,
+    observer_report: `
+        <div class="post-title">🔴 观测者维度报告</div>
         <div class="post-meta">发布者：STATION &nbsp;|&nbsp; 密级：最高</div>
         <div class="post-body">
-            <p style="color:#888;">[ 该档案内容待补充... ]</p>
+            <p><strong>档案编号：OBSERVER-REPORT-00</strong></p>
+            <p>观测者，并非神明，也非本世界产物。它们来自另一平行维度的地球，与我们一样是人类。唯一区别在于，它们掌握了<strong>跨维度干涉</strong>的能力。</p>
+            <p>这种干涉能力通过跨维度信号实现，但信号本身极度微弱，无法直接对本世界产生显著影响。观测者必须依赖本世界中的<strong>基站</strong>来放大信号，才能将能力投射到我们的现实之中。</p>
+            <p>观测者对外宣称的目的是“重构现实世界秩序”，但千百年过去了，它们始终没有完成这个目标。其真实动机至今存疑，有内部推测认为，它们只是在寻找某种<strong>脱离自身维度限制的方法</strong>。</p>
+            <p>观测者体系中已确认的职能个体包括：</p>
+            <p><strong>飞升者 OBSERVER-CN-001</strong>：制造意外，杀死目标，将意识转移至观测者世界。<br>
+            <strong>覆写者 OBSERVER-CN-002</strong>：精神干涉，强行篡改认知。<br>
+            <strong>添福菩萨 OBSERVER-CN-003</strong>：以民间信仰为伪装，消耗许愿者运势。<br>
+            <strong>过滤器 OBSERVER-CN-004</strong>：清除记忆，处理基站失败后的烂摊子。<br>
+            <strong>枢机（扳机）OBSERVER-CN-005</strong>：意念移物，制造“幸运事件”。<br>
+            <strong>先知 OBSERVER-CN-006</strong>：预知未来，能力受基站信号强度制约。</p>
+            <p style="color:#ff4d4d; font-weight:bold;">[警告]：当前终端已越权访问本档案。请立即关闭页面。</p>
+            <p style="color:#666; font-size:12px; margin-top:30px;">（档案结束。此页面禁止复制、截图或转发。）</p>
+        </div>
+    `,
+    base_station_manual: `
+        <div class="post-title">🔴 基站管理手册（节选）</div>
+        <div class="post-meta">发布者：STATION &nbsp;|&nbsp; 密级：最高</div>
+        <div class="post-body">
+            <p><strong>档案编号：BSC-MANUAL-02</strong></p>
+            <p>基站，是观测者在本世界行动的核心媒介。没有基站，观测者的跨维度信号就无法稳定投射。</p>
+            <p><strong>一、基站挑选标准</strong><br>
+            基站候选者必须拥有与观测者维度高度匹配的<strong>脑波波长</strong>。在本世界中，这类个体通常表现为反应迅速、专注力极强，常见于高强度竞技人群，如音游玩家、电竞选手、运动员等。</p>
+            <p><strong>二、成为基站的诱饵</strong><br>
+            组织向潜在基站承诺：成为基站后，死后有机会作为<strong>飞升者</strong>转生至观测者维度，并代理行使部分观测者能力。这一承诺已通过多种渠道传播，包括网络论坛、宗教团体、民间信仰等。</p>
+            <p><strong>三、基站日常状态</strong><br>
+            基站建成后，日常几乎无体感伤害，只会缓慢消耗部分生命能量。大多数基站甚至不知道自己的身份已被标记。</p>
+            <p><strong>四、基站失败处理</strong><br>
+            若基站搭建失败，或个体出现认知异常，将由<strong>过滤器</strong>介入，抹除当事人及相关人员的记忆，并进行现场善后。江岳市曾出现基站集中扎堆现象，过滤器在该地区执行过多次大规模记忆清除。</p>
+            <p style="color:#ff4d4d; font-weight:bold;">[系统提示]：当前终端已越权访问本档案。请立即关闭页面。</p>
+            <p style="color:#666; font-size:12px; margin-top:30px;">（档案结束。此页面禁止复制、截图或转发。）</p>
+        </div>
+    `,
+    filter_report: `
+        <div class="post-title">🔴 过滤器任务记录</div>
+        <div class="post-meta">发布者：STATION &nbsp;|&nbsp; 密级：最高</div>
+        <div class="post-body">
+            <p><strong>档案编号：FILTER-LOG-07</strong></p>
+            <p>任务目标：林哲（Track_4）事件善后<br>
+            执行者：OBSERVER-CN-004（过滤器）<br>
+            执行状态：部分完成</p>
+            <p><strong>已清除内容：</strong><br>
+            - 现场目击者关于“TRACK 05”的短期记忆<br>
+            - 论坛中涉及“101.4401%”的帖子及回复<br>
+            - 机台 #0044-A 本地录像片段<br>
+            - 部分舞萌玩家在社交媒体上的相关讨论</p>
+            <p><strong>未完成清除内容：</strong><br>
+            - 林哲通过非法程序散落在 maiPro 节点中的系统日志<br>
+            - 密钥碎片（已加密，无法直接消除）<br>
+            - 个别深度参与者的长期记忆（需要更高级别权限）</p>
+            <p>备注：过滤器在江岳市执行基站善后时，已多次遇到类似残留问题。建议加强信号屏蔽，防止外部人员通过残留数据追踪至组织。</p>
+            <p style="color:#ff4d4d; font-weight:bold;">[警告]：当前终端已越权访问本档案。请立即关闭页面。</p>
+            <p style="color:#666; font-size:12px; margin-top:30px;">（档案结束。此页面禁止复制、截图或转发。）</p>
         </div>
     `
 };
@@ -564,6 +790,8 @@ function verifyAdminLogin() {
         document.getElementById('btn-login').textContent = 'Symphony_Admin';
         document.getElementById('btn-login').style.color = '#4dff4d';
         document.getElementById('btn-login').onclick = null;
+        sessionStorage.setItem('arg_admin_logged_in', 'true');
+        sessionStorage.setItem('arg_admin_name', 'Symphony_Admin');
     } else {
         alert("❌ 管理员认证失败。请核对凭证。");
     }
@@ -604,6 +832,7 @@ function triggerArchiveUnlocked() {
     loginBtn.textContent = 'STATION';
     loginBtn.style.color = '#ff0000';
     loginBtn.classList.add('station-mode');
+    sessionStorage.setItem('arg_station_mode', 'true');
     setTimeout(() => overlay.remove(), 2000);
 }
 
@@ -613,24 +842,27 @@ function triggerJitterPage() {
     page.style.display = 'block';
     const container = document.createElement('div');
     container.className = 'jitter-text-container';
-    const sizes = [14, 18, 22, 28, 36, 48, 16, 20, 32, 40];
-    for (let i = 0; i < 150; i++) {
+    
+    const sizes = [14, 18, 22, 28, 36, 48, 16, 20, 32, 40, 52, 60];
+    for (let i = 0; i < 220; i++) {
         const word = document.createElement('span');
         word.className = 'jitter-word';
         word.textContent = '下一个就是你';
         word.style.fontSize = sizes[Math.floor(Math.random() * sizes.length)] + 'px';
         word.style.animationDelay = (Math.random() * 0.1) + 's';
         word.style.animationDuration = (0.05 + Math.random() * 0.15) + 's';
+        word.style.transform = `rotate(${Math.random() * 6 - 3}deg) scale(${0.8 + Math.random() * 0.4})`;
         container.appendChild(word);
     }
     page.appendChild(container);
     document.body.appendChild(page);
+    
     setTimeout(() => {
         page.remove();
         if (lastSearch) {
             showSearchResult(lastSearch.query, lastSearch.title, lastSearch.postId);
         }
-    }, 4000);
+    }, 8000);
 }
 
 function showSearchResult(query, title, postId) {
@@ -696,6 +928,18 @@ function doSearch() {
         } else {
             showSearchResult(query, '盛大世界', 'grand_world');
         }
+        return;
+    }
+    if (qLower === '观测者') {
+        showSearchResult(query, '观测者维度报告', 'observer_report');
+        return;
+    }
+    if (qLower === '基站') {
+        showSearchResult(query, '基站管理手册（节选）', 'base_station_manual');
+        return;
+    }
+    if (qLower === '过滤器') {
+        showSearchResult(query, '过滤器任务记录', 'filter_report');
         return;
     }
     alert('未找到与 "' + query + '" 相关的结果。');
